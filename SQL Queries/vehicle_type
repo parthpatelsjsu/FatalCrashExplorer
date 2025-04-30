@@ -1,0 +1,41 @@
+WITH accident_info AS (
+  SELECT
+    a.timestamp_of_crash,
+    a.state_name AS accident_state,
+    EXTRACT(YEAR FROM a.timestamp_of_crash) AS crash_year,
+    EXTRACT(MONTH FROM a.timestamp_of_crash) AS crash_month,
+    EXTRACT(HOUR FROM a.timestamp_of_crash) AS crash_hour,
+    CASE
+      WHEN p.non_motorist_location_at_time_of_crash_name LIKE '%Pedestrian%' THEN 'Walking'
+      WHEN p.non_motorist_location_at_time_of_crash_name LIKE '%Bicycle%' THEN 'Cycle'
+      WHEN v.trafficway_description LIKE '%Motorcycle%' THEN 'Bike'
+      ELSE 'Car'
+    END AS vehicle_type
+  FROM
+    `cmpe180b-project.nhtsa_traffic_fatalities.accidents` a
+  LEFT JOIN
+    `cmpe180b-project.nhtsa_traffic_fatalities.vehicle_all` v
+  ON
+    a.timestamp_of_crash = v.timestamp_of_crash
+    AND a.state_number= v.state_number -- Match state name for better join accuracy
+  LEFT JOIN
+    `cmpe180b-project.nhtsa_traffic_fatalities.person_all` p
+  ON
+    a.timestamp_of_crash = p.timestamp_of_crash
+    AND a.state_number = p.state_number -- Match state name for better join accuracy
+  WHERE
+    a.timestamp_of_crash IS NOT NULL
+)
+
+SELECT
+  crash_year,
+  crash_month,
+  crash_hour,
+  vehicle_type,
+  COUNT(*) AS number_of_accidents
+FROM
+  accident_info
+GROUP BY
+  crash_year, crash_month, crash_hour, vehicle_type
+ORDER BY
+  crash_year, crash_month, crash_hour, vehicle_type;

@@ -9,3 +9,4 @@ FROM
 WHERE
   hour_of_arrival_at_scene < 24
   AND minute_of_arrival_at_scene < 60;
+  

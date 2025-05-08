@@ -1,5 +1,7 @@
 # FatalCrashExplorer
 
+Dashboard: https://lookerstudio.google.com/s/i8D38lpw8Kk
+
 # Documents
 
 Contains the project requirements, project abstract, presentation slides, and project report.
